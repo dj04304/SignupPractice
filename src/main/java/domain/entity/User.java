@@ -10,7 +10,7 @@ public class User {
 	private String name;
 	private String email;
 	private String username;
-	private String pasword;
+	private String password;
 	private String roles;
 	private String provider;
 	private String user_profile_img;

@@ -45,7 +45,7 @@ public class UserDaoImpl implements UserDao{
 			pstmt.setString(1, user.getName());
 			pstmt.setString(2, user.getEmail());
 			pstmt.setString(3, user.getUsername());
-			pstmt.setString(4, user.getPasword());
+			pstmt.setString(4, user.getPassword());
 			pstmt.setString(5, user.getRoles());
 			pstmt.setString(6, user.getProvider());
 			result = pstmt.executeUpdate();
@@ -59,8 +59,54 @@ public class UserDaoImpl implements UserDao{
 	}
 
 	@Override
-	public User findUserByUsername() throws Exception {
-		return null;
+	public User findUserByUsername(String username) throws Exception {
+		User user = null;
+		sql = "SELECT\r\n"
+				+ "	um.user_code,\r\n"
+				+ "	um.name,\r\n"
+				+ "	um.email,\r\n"
+				+ "	um.username,\r\n"
+				+ "	um.password,\r\n"
+				+ "	um.roles,\r\n"
+				+ "	um.provider,\r\n"
+				+ "	ud.user_profile_img,\r\n"
+				+ "	ud.user_address,\r\n"
+				+ "	ud.user_phone,\r\n"
+				+ "	ud.user_gender\r\n"
+				+ "FROM\r\n"
+				+ "	user_mst um\r\n"
+				+ "	LEFT OUTER JOIN user_dtl ud ON(ud.user_code = um.user_code)\r\n"
+				+ "WHERE\r\n"
+				+ "	um.username = ?";
+		con = pool.getConnection();
+		try {
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, username);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				user = User.builder()
+						.user_code(rs.getInt(1))
+						.name(rs.getString(2))
+						.email(rs.getString(3))
+						.username(rs.getString(4))
+						.password(rs.getString(5))
+						.roles(rs.getString(6))
+						.provider(rs.getString(7))
+						.user_profile_img(rs.getString(8))
+						.user_address(rs.getString(9))
+						.user_phone(rs.getString(10))
+						.user_gender(rs.getString(11))
+						.build();
+			}
+			
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			pool.freeConnection(con, pstmt, rs);
+				
+		}
+		return user;
 	}
 
 	@Override
